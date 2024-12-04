@@ -9,3 +9,23 @@ body {
   width: 100vw;
   font-family: Roboto, sans-serif;
 }
+
+.profile-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.profile-image {
+  width: 50px;
+  height: 50px;
+  object-fit: cover; /* ทำให้รูปพอดีกับกรอบ */
+  border-radius: 10px;
+}
+
+.profile-name {
+  font-size: 16px;
+  font-weight: bold;
+  color: #ff5733;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}

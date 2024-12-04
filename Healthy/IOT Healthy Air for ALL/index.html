@@ -5,51 +5,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Healthy Air for All</title>
     <link
+      rel="icon"
+      href="/Healthy/IOT Healthy Air for ALL/images/newicon.png"
+      type="image/png"
+    />
+    <link
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="style.css" />
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {},
-        },
-      };
-    </script>
   </head>
 
-  <body class="bg-gray-100">
+  <body class="">
     <div class="flex flex-col lg:flex-row w-screen h-screen">
       <!-- Sidebar -->
       <div
-        class="sidebar flex-shrink-0 w-full lg:w-[250px] bg-gray-800 p-6 shadow-lg rounded-r-lg"
+        class="sidebar flex-shrink-0 w-full lg:w-[250px] bg-gray-800 p-6 shadow-lg z-10"
       >
         <!-- Mobile Menu Button -->
-        <div class="lg:hidden flex justify-between items-center mb-8">
+        <div class="lg:hidden justify-between flex items-center">
           <button id="menuButton" class="text-white text-2xl">
             <i class="fas fa-bars"></i>
           </button>
+
+          <!-- Profile Section mobile-->
+          <div class="profile-container justify-end">
+            <img
+              src="/Healthy/IOT Healthy Air for ALL/images/profile.png"
+              alt="Profile Picture"
+              class="profile-image"
+            />
+            <span class="profile-name">User</span>
+          </div>
         </div>
 
         <!-- Profile Section -->
-        <div class="profile-container mb-8 text-center">
+        <div class="profile-container hidden lg:flex">
           <img
-            class="w-20 h-20 mx-auto rounded-full border-4 border-green-500"
-            src="profile.png"
-            alt="Profile"
+            src="/Healthy/IOT Healthy Air for ALL/images/profile.png"
+            alt="Profile Picture"
+            class="profile-image"
           />
-          <p class="text-white font-semibold mt-3 text-lg">John Doe</p>
+          <span class="profile-name">User</span>
         </div>
 
-        <!-- Icon Group -->
+        <!-- Menu Items -->
         <div
-          class="icon-group flex flex-col justify-center gap-6 lg:gap-8 mt-6"
+          class="hidden lg:flex icon-group flex-col justify-center gap-6 lg:gap-8 mt-6"
           id="menuItems"
         >
           <!-- Home -->
           <a
-            href="/DevCE453/main.html"
+            href="/Healthy/IOT Healthy Air for ALL/index.html"
             class="icon text-white hover:text-green-500 transition-colors duration-300 flex items-center space-x-3"
           >
             <i class="fas fa-home text-2xl"></i>
@@ -59,7 +67,7 @@
           <!-- Dashboard -->
           <a
             href="#"
-            class="icon text-white hover:text-green-500 transition-colors duration-300 flex items-center space-x-3"
+            class="icon text-white hover:text-yellow-500 transition-colors duration-300 flex items-center space-x-3"
           >
             <i class="fas fa-chart-bar text-2xl"></i>
             <span class="text-sm lg:text-base">Dashboard</span>
@@ -68,7 +76,8 @@
           <!-- Settings -->
           <a
             href="#"
-            class="icon text-white hover:text-green-500 transition-colors duration-300 flex items-center space-x-3"
+            class="icon text-white hover:text-orange-500 transition-colors duration-300 flex items-center space-x-3"
+            onclick="open_Modal_Setting()"
           >
             <i class="fas fa-cog text-2xl"></i>
             <span class="text-sm lg:text-base">Settings</span>
@@ -77,10 +86,20 @@
           <!-- History -->
           <a
             href="#"
-            class="icon text-white hover:text-green-500 transition-colors duration-300 flex items-center space-x-3"
+            class="icon text-white hover:text-pink-500 transition-colors duration-300 flex items-center space-x-3"
           >
             <i class="fas fa-clock text-2xl"></i>
             <span class="text-sm lg:text-base">History</span>
+          </a>
+
+          <!-- About -->
+          <a
+            href="#"
+            class="icon text-white hover:text-blue-500 transition-colors duration-300 flex items-center space-x-3 mt-4"
+            onclick="open_Modal_About()"
+          >
+            <i class="fas fa-info-circle text-2xl"></i>
+            <span class="text-sm lg:text-base">About</span>
           </a>
 
           <!-- Logout -->
@@ -91,42 +110,116 @@
             <i class="fas fa-sign-out-alt text-2xl"></i>
             <span class="text-sm lg:text-base">Logout</span>
           </a>
+        </div>
+
+        <!-- Menu Items mobile-->
+        <div
+          class="fixed bg-gray-600 p-6 hidden flex icon-group flex-col justify-center gap-6 lg:gap-8 mt-6"
+          id="menuItemsmobile"
+        >
+          <!-- Home -->
+          <a
+            href="/Healthy/IOT Healthy Air for ALL/index.html"
+            class="icon text-white hover:text-green-500 transition-colors duration-300 flex items-center space-x-3"
+          >
+            <i class="fas fa-home text-2xl"></i>
+            <span class="text-sm lg:text-base">Home 2</span>
+          </a>
+
+          <!-- Dashboard -->
+          <a
+            href="#"
+            class="icon text-white hover:text-yellow-500 transition-colors duration-300 flex items-center space-x-3"
+          >
+            <i class="fas fa-chart-bar text-2xl"></i>
+            <span class="text-sm lg:text-base">Dashboard</span>
+          </a>
+
+          <!-- Settings -->
+          <a
+            href="#"
+            class="icon text-white hover:text-orange-500 transition-colors duration-300 flex items-center space-x-3"
+            onclick="open_Modal_Setting()"
+          >
+            <i class="fas fa-cog text-2xl"></i>
+            <span class="text-sm lg:text-base">Settings</span>
+          </a>
+
+          <!-- History -->
+          <a
+            href="#"
+            class="icon text-white hover:text-pink-500 transition-colors duration-300 flex items-center space-x-3"
+          >
+            <i class="fas fa-clock text-2xl"></i>
+            <span class="text-sm lg:text-base">History</span>
+          </a>
 
           <!-- About -->
           <a
             href="#"
             class="icon text-white hover:text-blue-500 transition-colors duration-300 flex items-center space-x-3 mt-4"
+            onclick="open_Modal_About()"
           >
             <i class="fas fa-info-circle text-2xl"></i>
             <span class="text-sm lg:text-base">About</span>
+          </a>
+
+          <!-- Logout -->
+          <a
+            href="/logout"
+            class="icon text-white hover:text-red-500 transition-colors duration-300 flex items-center space-x-3 mt-4"
+          >
+            <i class="fas fa-sign-out-alt text-2xl"></i>
+            <span class="text-sm lg:text-base">Logout</span>
           </a>
         </div>
       </div>
 
       <!-- Dashboard -->
       <div class="dashboard flex-grow p-6 lg:w-[93%] overflow-auto">
-        <header class="flex justify-between items-center mb-6 px-4 lg:px-10">
-          <div>
+        <header
+          class="flex flex-col lg:flex-row justify-between items-center mb-8 px-4 lg:px-10 space-y-6 lg:space-y-0"
+        >
+          <div
+            class="flex flex-col items-center lg:items-start space-y-4 lg:space-y-0"
+          >
+            <!-- Title Section -->
             <h1
-              class="text-4xl lg:text-6xl font-extrabold text-gradient bg-clip-text text-transparent bg-green-500 drop-shadow-lg"
+              class="text-4xl lg:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-green-500 via-blue-500 to-teal-400 flex items-center space-x-3 animate-fade-in"
             >
-              Healthy Air for All
+              <img
+                src="/Healthy/IOT Healthy Air for ALL/images/fresh-air.png"
+                width="50px"
+                height="50px"
+                class="animate-bounce"
+              />
+              <span class="animate-slide-right">Healthy Air for All</span>
             </h1>
-            <p class="text-sm text-gray-600 mt-2 font-medium" id="datetime">
-              Date Time : วันที่ เดือน พ.ศ. เวลา น.
-            </p>
           </div>
 
-          <div class="relative flex items-center">
-            <input
-              type="text"
-              id="search"
-              class="p-3 pl-10 pr-4 border-2 border-gray-300 rounded-xl shadow-lg focus:ring-4 focus:ring-green-400 focus:outline-none text-gray-700 placeholder-gray-500 transition duration-300 ease-in-out"
-              placeholder="Search..."
-            />
-            <i
-              class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"
-            ></i>
+          <div
+            class="flex flex-col lg:flex-row items-center lg:space-x-6 space-y-4 lg:space-y-0"
+          >
+            <!-- Date Time Section with Gradient Background -->
+            <p
+              class="text-base lg:text-lg font-medium text-black bg-white-600 py-2 px-4 rounded-md inline-block mt-3 border border-gray-300 transition-all duration-300 ease-in-out transform hidden lg:block"
+              id="datetime"
+            >
+              Date Time : วันที่ เดือน พ.ศ. เวลา น.
+            </p>
+
+            <!-- Search Section -->
+            <div class="relative flex items-center">
+              <input
+                type="text"
+                id="search"
+                class="p-3 pl-12 pr-4 w-full sm:w-72 lg:w-96 border-2 border-gray-300 rounded-full shadow-l focus:ring-4 focus:ring-teal-400 focus:outline-none text-gray-700 placeholder-gray-500 transition duration-300 ease-in-out"
+                placeholder="Search..."
+              />
+              <i
+                class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 text-lg"
+              ></i>
+            </div>
           </div>
         </header>
 
@@ -207,13 +300,77 @@
         </section>
       </div>
     </div>
-    <script>
-      const menuButton = document.getElementById('menuButton');
-      const menuItems = document.getElementById('menuItems');
 
-      menuButton.addEventListener('click', () => {
-        menuItems.classList.toggle('hidden');
+    <div
+      id="modal_about"
+      class="fixed inset-0 bg-gray-500 bg-opacity-75 flex justify-center items-center hidden z-20"
+    >
+      <div class="bg-white p-6 rounded-lg shadow-lg max-w-xl w-full">
+        <h2 class="text-xl font-semibold text-gray-700">About Us</h2>
+        <p class="mt-2 text-gray-600">
+          At [Your Company Name], we are committed to providing real-time data
+          insights to help you manage and optimize your environment more
+          efficiently. Our platform integrates advanced sensors and analytics to
+          deliver detailed information on key metrics such as Temperature,
+          Humidity, and Smoke Levels. Whether you're managing a smart building,
+          monitoring industrial conditions, or overseeing environmental factors,
+          our dashboard is designed to give you a comprehensive overview of
+          critical data at your fingertips
+        </p>
+        <div class="mt-4 flex justify-end">
+          <button
+            onclick="close_Modal_About()"
+            class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div
+      id="modal_setting"
+      class="fixed inset-0 bg-gray-500 bg-opacity-75 flex justify-center items-center hidden z-20"
+    >
+      <div class="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full">
+        <h2 class="text-xl font-semibold text-gray-700">Setting</h2>
+        <p class="mt-2 text-gray-600">
+          This is an example modal_about popup. You can provide information
+          here.
+        </p>
+        <div class="mt-4 flex justify-end">
+          <button
+            onclick="close_Modal_Setting()"
+            class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+    <script>
+      const menuButton = document.getElementById("menuButton");
+      const menuItems = document.getElementById("menuItemsmobile");
+
+      menuButton.addEventListener("click", () => {
+        menuItems.classList.toggle("hidden");
       });
+
+      function open_Modal_About() {
+        document.getElementById("modal_about").classList.remove("hidden");
+      }
+
+      function close_Modal_About() {
+        document.getElementById("modal_about").classList.add("hidden");
+      }
+
+      function open_Modal_Setting() {
+        document.getElementById("modal_setting").classList.remove("hidden");
+      }
+
+      function close_Modal_Setting() {
+        document.getElementById("modal_setting").classList.add("hidden");
+      }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="script.js"></script>

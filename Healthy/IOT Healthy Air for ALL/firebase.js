@@ -1,4 +1,3 @@
-// Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
 import {
   getDatabase,
@@ -7,11 +6,7 @@ import {
   query,
   limitToLast,
 } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyCsLbgaIiGDIFSOFS79BhfjgfZNjJixk2Y",
   authDomain: "esp8266project-2ce1e.firebaseapp.com",
@@ -46,9 +41,13 @@ onValue(limitedQuery, (snapshot) => {
   const data = snapshot.val();
   const results = [];
   const currentTimestamps = [];
+  const dailyData = {}; // เก็บข้อมูลแยกตามวัน
 
   for (const key in data) {
     if (data.hasOwnProperty(key)) {
+      const entry = data[key];
+      const timestamp = parseTimestamp(entry.timestamp);
+      const dateKey = timestamp.toISOString().split("T")[0];
       results.push(data[key]);
 
       // แปลงและเก็บค่า timestamp
@@ -72,6 +71,14 @@ onValue(limitedQuery, (snapshot) => {
         console.error(`Missing timestamp for key: ${key}`);
         currentTimestamps.push("Invalid Time");
       }
+
+      if (!dailyData[dateKey]) {
+        dailyData[dateKey] = { temperature: [], humidity: [], smoke: [] };
+      }
+
+      dailyData[dateKey].temperature.push(parseInt(entry.temperature, 10));
+      dailyData[dateKey].humidity.push(parseInt(entry.humidity, 10));
+      dailyData[dateKey].smoke.push(parseInt(entry.smoke_level, 10));
     }
   }
 
@@ -108,13 +115,52 @@ onValue(limitedQuery, (snapshot) => {
       [avgSmoke] // ส่งค่าเฉลี่ยควัน
     );
 
-    // รีเซ็ตข้อมูลหลังจากแสดงผลแล้ว
     temperatureData = [];
     humidityData = [];
     smokeData = [];
     timestamps = [];
-    accumulatedTime = 0; // รีเซ็ตเวลา
+    accumulatedTime = 0;
   }
 
-  // updateBarChart(humidityData, temperatureData, smokeData);
+  // คำนวณค่าเฉลี่ยรายวัน
+  const labels = Object.keys(dailyData).map((dateKey) =>
+    convertToBuddhistYear(dateKey)
+  );
+  const dailyTemperatureAvg = labels.map((_, index) => {
+    const temperatureData = dailyData[Object.keys(dailyData)[index]]?.temperature;
+    return temperatureData ? averageData(temperatureData) : 0; // ใช้ค่าเริ่มต้นเป็น 0 หากไม่พบข้อมูล
+  });
+  
+  const dailyHumidityAvg = labels.map((_, index) => {
+    const humidityData = dailyData[Object.keys(dailyData)[index]]?.humidity;
+    return humidityData ? averageData(humidityData) : 0; // ใช้ค่าเริ่มต้นเป็น 0 หากไม่พบข้อมูล
+  });
+  
+  const dailySmokeAvg = labels.map((_, index) => {
+    const smokeData = dailyData[Object.keys(dailyData)[index]]?.smoke;
+    return smokeData ? averageData(smokeData) : 0; // ใช้ค่าเริ่มต้นเป็น 0 หากไม่พบข้อมูล
+  });
+
+  // อัปเดตกราฟ
+  updateBarChart(labels, dailyHumidityAvg, dailyTemperatureAvg, dailySmokeAvg);
 });
+
+function averageDailyData(data) {
+  const sum = data.reduce((acc, value) => acc + value, 0);
+  return data.length ? sum / data.length : 0;
+}
+
+function parseTimestamp(timestamp) {
+  const [datePart, timePart] = timestamp.split(" "); // แยกวันที่และเวลา
+  const [day, month, year] = datePart.split("-"); // แยกส่วนของวันที่
+  return new Date(`${year}-${month}-${day}T${timePart}`);
+}
+
+function convertToBuddhistYear(dateString) {
+  const date = new Date(dateString); // แปลงเป็น Date object
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0"); // เดือนเริ่มจาก 0
+  const year = date.getFullYear() + 543; // แปลงเป็น พ.ศ.
+  return `${day}/${month}/${year}`;
+}
+

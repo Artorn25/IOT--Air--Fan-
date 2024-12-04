@@ -1,4 +1,4 @@
-let lineChartInstance; // ตัวแปรสำหรับเก็บ instance ของ Line Chart
+let lineChartInstance, barChartInstance;
 
 function updateLineChart(timestamps, humidityData, temperatureData, smokeData) {
   console.log("Updating chart with:", {
@@ -9,49 +9,47 @@ function updateLineChart(timestamps, humidityData, temperatureData, smokeData) {
   });
   const ctxLine = document.getElementById("lineChart").getContext("2d");
 
-  // ตรวจสอบว่ากราฟถูกสร้างไว้แล้วหรือไม่
   if (!lineChartInstance) {
-    // หากกราฟยังไม่มี ก็สร้างกราฟใหม่
     lineChartInstance = new Chart(ctxLine, {
       type: "line",
       data: {
-        labels: timestamps, // ใช้ timestamps ที่ส่งเข้ามา
+        labels: timestamps,
         datasets: [
           {
             label: "Temperature (°C)",
             data: temperatureData,
-            borderColor: "rgba(255, 165, 0, 0.8)",
-            backgroundColor: "rgba(255, 165, 0, 0.3)",
-            fill: true,
-            tension: 0.4,
-            borderWidth: 2,
+            borderColor: "rgba(255, 165, 0, 1)",
+            backgroundColor: "transparent", // No background fill
+            fill: false, // Disable the background fill
+            tension: 0.3,
+            borderWidth: 3,
             pointStyle: "circle",
-            pointRadius: 4,
-            pointBackgroundColor: "rgba(255, 165, 0, 0.8)",
+            pointRadius: 5,
+            pointBackgroundColor: "rgba(255, 165, 0, 1)",
           },
           {
             label: "Humidity (%)",
             data: humidityData,
-            borderColor: "rgba(30, 144, 255, 0.8)",
-            backgroundColor: "rgba(30, 144, 255, 0.3)",
-            fill: true,
-            tension: 0.4,
-            borderWidth: 2,
+            borderColor: "rgba(30, 144, 255, 1)",
+            backgroundColor: "transparent", // No background fill
+            fill: false, // Disable the background fill
+            tension: 0.3,
+            borderWidth: 3,
             pointStyle: "circle",
-            pointRadius: 4,
-            pointBackgroundColor: "rgba(30, 144, 255, 0.8)",
+            pointRadius: 5,
+            pointBackgroundColor: "rgba(30, 144, 255, 1)",
           },
           {
             label: "Smoke Level",
             data: smokeData,
-            borderColor: "rgba(138, 43, 226, 0.8)",
-            backgroundColor: "rgba(138, 43, 226, 0.3)",
-            fill: true,
-            tension: 0.4,
-            borderWidth: 2,
+            borderColor: "rgba(138, 43, 226, 1)",
+            backgroundColor: "transparent", // No background fill
+            fill: false, // Disable the background fill
+            tension: 0.3,
+            borderWidth: 3,
             pointStyle: "circle",
-            pointRadius: 4,
-            pointBackgroundColor: "rgba(138, 43, 226, 0.8)",
+            pointRadius: 5,
+            pointBackgroundColor: "rgba(138, 43, 226, 1)",
           },
         ],
       },
@@ -62,13 +60,17 @@ function updateLineChart(timestamps, humidityData, temperatureData, smokeData) {
           legend: {
             position: "top",
             labels: {
-              font: { size: 14 },
+              font: { size: 16, weight: "bold" },
               color: "#333",
             },
           },
           tooltip: {
-            enabled: true,
-            backgroundColor: "rgba(0, 0, 0, 0.8)",
+            backgroundColor: "rgba(0, 0, 0, 0.7)",
+            titleFont: { size: 14, weight: "bold" },
+            bodyFont: { size: 12 },
+            footerFont: { size: 10 },
+            titleColor: "#fff",
+            bodyColor: "#fff",
           },
         },
         scales: {
@@ -79,7 +81,14 @@ function updateLineChart(timestamps, humidityData, temperatureData, smokeData) {
               font: { size: 16, weight: "bold" },
               color: "#333",
             },
-            ticks: { color: "#555", font: { size: 12 } },
+            ticks: {
+              color: "#555",
+              font: { size: 12 },
+            },
+            grid: {
+              color: "#ddd",
+              lineWidth: 1,
+            },
           },
           y: {
             title: {
@@ -88,109 +97,143 @@ function updateLineChart(timestamps, humidityData, temperatureData, smokeData) {
               font: { size: 16, weight: "bold" },
               color: "#333",
             },
-            ticks: { color: "#555", font: { size: 12 } },
+            ticks: {
+              color: "#555",
+              font: { size: 12 },
+            },
+            grid: {
+              color: "#ddd",
+              lineWidth: 1,
+            },
           },
         },
       },
     });
   } else {
-    // หากกราฟมีอยู่แล้ว, อัปเดตข้อมูลของกราฟ
     lineChartInstance.data.labels = [
       ...lineChartInstance.data.labels,
       ...timestamps,
-    ]; // เพิ่ม timestamps ใหม่เข้าไปใน labels
+    ];
     lineChartInstance.data.datasets[0].data = [
       ...lineChartInstance.data.datasets[0].data,
       ...temperatureData,
-    ]; // เพิ่มข้อมูล temperature ใหม่
+    ];
     lineChartInstance.data.datasets[1].data = [
       ...lineChartInstance.data.datasets[1].data,
       ...humidityData,
-    ]; // เพิ่มข้อมูล humidity ใหม่
+    ];
     lineChartInstance.data.datasets[2].data = [
       ...lineChartInstance.data.datasets[2].data,
       ...smokeData,
-    ]; // เพิ่มข้อมูล smoke ใหม่
-    lineChartInstance.update(); // อัปเดตกราฟ
+    ];
+    lineChartInstance.update();
   }
 }
 
-function updateBarChart(humidityData, temperatureData, smokeData) {
+function updateBarChart(
+  labels,
+  dailyHumidityAvg,
+  dailyTemperatureAvg,
+  dailySmokeAvg
+) {
   const ctxBar = document.getElementById("barChart").getContext("2d");
-  new Chart(ctxBar, {
-    type: "bar",
-    data: {
-      labels: ["Day 1", "Day 2", "Day 3", "Day 4", "Day 5"], // ตัวอย่าง labels
-      datasets: [
-        {
-          label: "Temperature (°C)",
-          data: temperatureData.slice(0, 5), // ใช้เฉพาะ 5 ค่าแรก
-          backgroundColor: "rgba(255, 165, 0, 0.7)", // สีส้ม
-        },
-        {
-          label: "Humidity (%)",
-          data: humidityData.slice(0, 5), // ใช้เฉพาะ 5 ค่าแรก
-          backgroundColor: "rgba(0, 0, 255, 0.7)", // สีน้ำเงิน
-        },
-        {
-          label: "Smoke Level",
-          data: smokeData.slice(0, 5), // ใช้เฉพาะ 5 ค่าแรก
-          backgroundColor: "rgba(128, 0, 128, 0.7)", // สีม่วง
-        },
-      ],
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          display: true,
-          position: "top",
-        },
+
+  if (!barChartInstance) {
+    barChartInstance = new Chart(ctxBar, {
+      type: "bar",
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: "Average Temperature (°C)",
+            data: dailyTemperatureAvg,
+            backgroundColor: "rgba(255, 165, 0, 0.6)",
+            borderColor: "rgba(255, 165, 0, 1)",
+            borderWidth: 2,
+            hoverBackgroundColor: "rgba(255, 165, 0, 0.8)",
+          },
+          {
+            label: "Average Humidity (%)",
+            data: dailyHumidityAvg,
+            backgroundColor: "rgba(30, 144, 255, 0.6)",
+            borderColor: "rgba(30, 144, 255, 1)",
+            borderWidth: 2,
+            hoverBackgroundColor: "rgba(30, 144, 255, 0.8)",
+          },
+          {
+            label: "Average Smoke Level",
+            data: dailySmokeAvg,
+            backgroundColor: "rgba(138, 43, 226, 0.6)",
+            borderColor: "rgba(138, 43, 226, 1)",
+            borderWidth: 2,
+            hoverBackgroundColor: "rgba(138, 43, 226, 0.8)",
+          },
+        ],
       },
-      scales: {
-        x: {
-          grid: {
-            display: false,
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: "top",
+            labels: {
+              font: { size: 14, weight: "bold" },
+              color: "#333",
+            },
+          },
+          tooltip: {
+            backgroundColor: "rgba(0, 0, 0, 0.7)",
+            titleFont: { size: 14, weight: "bold" },
+            bodyFont: { size: 12 },
+            footerFont: { size: 10 },
+            titleColor: "#fff",
+            bodyColor: "#fff",
           },
         },
-        y: {
-          beginAtZero: true,
+        scales: {
+          x: {
+            grid: {
+              display: false,
+            },
+            ticks: {
+              color: "#555",
+              font: { size: 12 },
+            },
+          },
+          y: {
+            beginAtZero: true,
+            ticks: {
+              color: "#555",
+              font: { size: 12 },
+            },
+            grid: {
+              color: "#ddd",
+              lineWidth: 1,
+            },
+          },
         },
       },
-    },
-  });
+    });
+  } else {
+    barChartInstance.data.labels = labels;
+    barChartInstance.data.datasets[0].data = dailyTemperatureAvg;
+    barChartInstance.data.datasets[1].data = dailyHumidityAvg;
+    barChartInstance.data.datasets[2].data = dailySmokeAvg;
+    barChartInstance.update();
+  }
 }
 
-function formatDateTime() {
-  const optionsDate = {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  };
-  const optionsTime = {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  };
+function updateDateTime() {
+  const datetimeElement = document.getElementById("datetime"),
+    now = new Date(),
+    day = now.getDate(),
+    month = now.toLocaleString("th-TH", { month: "long" }),
+    year = now.getFullYear() + 543,
+    time = now.toLocaleTimeString("th-TH");
 
-  // วันที่ในรูปแบบภาษาไทย
-  const date = new Date().toLocaleDateString("th-TH", optionsDate);
-  const time = new Date().toLocaleTimeString("th-TH", optionsTime);
-
-  // แสดงผลในรูปแบบ วันที่ และ เวลา
-  const fullDateTime = `วันที่ ${date} เวลา ${time} น.`;
-
-  document.getElementById("datetime").innerHTML = `Date Time : ${fullDateTime}`;
+  datetimeElement.textContent = `Date Time : ${day} ${month} ${year} เวลา : ${time}`;
 }
 
-function parseTimestamp(timestamp) {
-  const [datePart, timePart] = timestamp.split(" "); // แยกวันที่และเวลา
-  const [day, month, year] = datePart.split("-"); // แยกส่วนของวันที่
-  return new Date(`${year}-${month}-${day}T${timePart}`);
-}
+setInterval(updateDateTime, 1000);
 
-// เรียกใช้งานฟังก์ชั่นเมื่อโหลดหน้า
-window.onload = function () {
-  formatDateTime(); // เรียกใช้ฟังก์ชั่นแสดงวันที่และเวลา
-};
+updateDateTime();
