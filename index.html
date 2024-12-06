@@ -123,7 +123,7 @@
             class="icon text-white hover:text-green-500 transition-colors duration-300 flex items-center space-x-3"
           >
             <i class="fas fa-home text-2xl"></i>
-            <span class="text-sm lg:text-base">Home 2</span>
+            <span class="text-sm lg:text-base">Home </span>
           </a>
 
           <!-- Dashboard -->
@@ -294,6 +294,7 @@
 
         <section>
           <h3 class="text-lg font-bold mb-4">History</h3>
+          <input type="date" id="datePicker" />
           <div class="chart-container mb-6">
             <canvas id="barChart" class="w-full h-[250px]"></canvas>
           </div>
@@ -306,16 +307,28 @@
       class="fixed inset-0 bg-gray-500 bg-opacity-75 flex justify-center items-center hidden z-20"
     >
       <div class="bg-white p-6 rounded-lg shadow-lg max-w-xl w-full">
-        <h2 class="text-xl font-semibold text-gray-700">About Us</h2>
-        <p class="mt-2 text-gray-600">
-          At [Your Company Name], we are committed to providing real-time data
-          insights to help you manage and optimize your environment more
-          efficiently. Our platform integrates advanced sensors and analytics to
-          deliver detailed information on key metrics such as Temperature,
-          Humidity, and Smoke Levels. Whether you're managing a smart building,
-          monitoring industrial conditions, or overseeing environmental factors,
-          our dashboard is designed to give you a comprehensive overview of
-          critical data at your fingertips
+        <h2 class="text-xl font-bold text-gray-900 mb-4">About Us</h2>
+        <p class="text-gray-700 mb-2">
+          Welcome to <strong>Healthy Air for All</strong>, your comprehensive
+          solution for real-time air quality monitoring. Our platform provides
+          essential data to ensure a healthier living environment for everyone.
+        </p>
+        <h3 class="text-lg font-semibold text-gray-800 mt-4">Our Mission</h3>
+        <p class="text-gray-700">
+          At Healthy Air for All, we aim to empower communities with reliable
+          tools to monitor and improve air quality.
+        </p>
+        <h3 class="text-lg font-semibold text-gray-800 mt-4">Key Features</h3>
+        <ul class="list-disc list-inside text-gray-700">
+          <li>Real-Time Monitoring</li>
+          <li>Interactive Dashboard</li>
+          <li>Personalized Experience</li>
+          <li>Historical Data</li>
+        </ul>
+        <h3 class="text-lg font-semibold text-gray-800 mt-4">Why Choose Us?</h3>
+        <p class="text-gray-700">
+          Healthy Air for All stands out with its intuitive design, reliable
+          data, and commitment to creating a healthier environment.
         </p>
         <div class="mt-4 flex justify-end">
           <button
@@ -371,9 +384,30 @@
       function close_Modal_Setting() {
         document.getElementById("modal_setting").classList.add("hidden");
       }
+
+      function setCurrentDate() {
+        const today = new Date();
+
+        const options = {
+          timeZone: "Asia/Bangkok",
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        };
+        const thaiDate = today.toLocaleString("en-GB", options); // ใช้ 'en-GB' เพื่อให้ได้รูปแบบ dd/mm/yyyy
+
+        const formattedDate = thaiDate.split("/").reverse().join("-"); // แปลง dd/mm/yyyy เป็น yyyy-mm-dd
+
+        document.getElementById("datePicker").value = formattedDate;
+      }
+
+      setCurrentDate();
     </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="/Healthy/IOT Healthy Air for ALL/script.js"></script>
-    <script src="/Healthy/IOT Healthy Air for ALL/firebase.js" type="module"></script>
+    <script
+      src="/Healthy/IOT Healthy Air for ALL/firebase.js"
+      type="module"
+    ></script>
   </body>
 </html>

@@ -4,7 +4,6 @@ import {
   ref,
   onValue,
   query,
-  limitToLast,
 } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
 
 const firebaseConfig = {
@@ -20,29 +19,33 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-const db = getDatabase();
+const db = getDatabase(app);
 
 const starCountRef = ref(db, "esp8266_data");
-const limitedQuery = query(starCountRef, limitToLast(25));
+const limitedQuery = query(starCountRef);
 
-let lastTimestamp = null; // ตัวแปรเก็บเวลา timestamp ล่าสุด
-let accumulatedTime = 0; // เวลาที่สะสมจากแต่ละ timestamp
-let temperatureData = [];
-let humidityData = [];
-let smokeData = [];
-let timestamps = [];
-
-function averageData(data) {
-  const sum = data.reduce((acc, value) => acc + value, 0);
-  return sum / data.length;
-}
+let lastTimestamp = null,
+  accumulatedTime = 0,
+  temperatureData = [],
+  humidityData = [],
+  smokeData = [],
+  timestamps = [];
 
 onValue(limitedQuery, (snapshot) => {
-  const data = snapshot.val();
-  const results = [];
-  const currentTimestamps = [];
-  const dailyData = {}; // เก็บข้อมูลแยกตามวัน
+  const data = snapshot.val(),
+    results = [],
+    currentTimestamps = [],
+    dailyData = {};
 
+  const currentDate = new Date();
+  const currentWeek = getWeekFromDate(currentDate).sort((a, b) => {
+    return new Date(a) - new Date(b);
+  });
+
+  console.log("Current Week: ", currentWeek);
+
+  const dataCount = data ? Object.keys(data).length : 0; // นับจำนวนข้อมูลในฐานข้อมูล
+  console.log("Number of records in Firebase: ", dataCount);
   for (const key in data) {
     if (data.hasOwnProperty(key)) {
       const entry = data[key];
@@ -51,8 +54,8 @@ onValue(limitedQuery, (snapshot) => {
       results.push(data[key]);
 
       // แปลงและเก็บค่า timestamp
-      if (data[key].timestamp) {
-        const timestamp = parseTimestamp(data[key].timestamp);
+      if (entry.timestamp) {
+        const timestamp = parseTimestamp(entry.timestamp);
         currentTimestamps.push(
           `${timestamp.getHours()}:${timestamp
             .getMinutes()
@@ -61,8 +64,7 @@ onValue(limitedQuery, (snapshot) => {
         );
 
         if (lastTimestamp) {
-          // คำนวณเวลาผ่านไป
-          const timeDiff = (timestamp - lastTimestamp) / 1000; // เวลาเป็นวินาที
+          const timeDiff = (timestamp - lastTimestamp) / 1000;
           accumulatedTime += timeDiff;
         }
 
@@ -72,13 +74,15 @@ onValue(limitedQuery, (snapshot) => {
         currentTimestamps.push("Invalid Time");
       }
 
-      if (!dailyData[dateKey]) {
-        dailyData[dateKey] = { temperature: [], humidity: [], smoke: [] };
-      }
+      if (currentWeek.includes(dateKey)) {
+        if (!dailyData[dateKey]) {
+          dailyData[dateKey] = { temperature: [], humidity: [], smoke: [] };
+        }
 
-      dailyData[dateKey].temperature.push(parseInt(entry.temperature, 10));
-      dailyData[dateKey].humidity.push(parseInt(entry.humidity, 10));
-      dailyData[dateKey].smoke.push(parseInt(entry.smoke_level, 10));
+        dailyData[dateKey].temperature.push(parseInt(entry.temperature, 10));
+        dailyData[dateKey].humidity.push(parseInt(entry.humidity, 10));
+        dailyData[dateKey].smoke.push(parseInt(entry.smoke_level, 10));
+      }
     }
   }
 
@@ -90,7 +94,6 @@ onValue(limitedQuery, (snapshot) => {
   smokeData.push(...results.map((item) => parseInt(item.smoke_level, 10)));
   timestamps.push(...currentTimestamps);
 
-  // แสดงข้อมูลล่าสุดในหน้าเว็บ
   document.getElementById("temp").innerHTML = `${parseInt(
     temperatureData[temperatureData.length - 1]
   )} °C`;
@@ -102,17 +105,15 @@ onValue(limitedQuery, (snapshot) => {
   console.log(accumulatedTime);
 
   if (accumulatedTime >= 60) {
-    // คำนวณค่าเฉลี่ยของข้อมูล
-    const avgTemperature = averageData(temperatureData);
-    const avgHumidity = averageData(humidityData);
-    const avgSmoke = averageData(smokeData);
+    const avgTemperature = averageData(temperatureData),
+      avgHumidity = averageData(humidityData),
+      avgSmoke = averageData(smokeData);
 
-    // อัปเดตกราฟ
     updateLineChart(
       [currentTimestamps[currentTimestamps.length - 1]], // ส่ง timestamp ล่าสุด
-      [avgHumidity], // ส่งค่าเฉลี่ยความชื้น
-      [avgTemperature], // ส่งค่าเฉลี่ยอุณหภูมิ
-      [avgSmoke] // ส่งค่าเฉลี่ยควัน
+      [avgHumidity],
+      [avgTemperature],
+      [avgSmoke]
     );
 
     temperatureData = [];
@@ -122,45 +123,58 @@ onValue(limitedQuery, (snapshot) => {
     accumulatedTime = 0;
   }
 
-  // คำนวณค่าเฉลี่ยรายวัน
-  const labels = Object.keys(dailyData).map((dateKey) =>
-    convertToBuddhistYear(dateKey)
-  );
-  const dailyTemperatureAvg = labels.map((_, index) => {
-    const temperatureData = dailyData[Object.keys(dailyData)[index]]?.temperature;
-    return temperatureData ? averageData(temperatureData) : 0; // ใช้ค่าเริ่มต้นเป็น 0 หากไม่พบข้อมูล
-  });
-  
-  const dailyHumidityAvg = labels.map((_, index) => {
-    const humidityData = dailyData[Object.keys(dailyData)[index]]?.humidity;
-    return humidityData ? averageData(humidityData) : 0; // ใช้ค่าเริ่มต้นเป็น 0 หากไม่พบข้อมูล
-  });
-  
-  const dailySmokeAvg = labels.map((_, index) => {
-    const smokeData = dailyData[Object.keys(dailyData)[index]]?.smoke;
-    return smokeData ? averageData(smokeData) : 0; // ใช้ค่าเริ่มต้นเป็น 0 หากไม่พบข้อมูล
+  // คำนวณค่าเฉลี่ย
+  const labels = currentWeek.map((dateKey) => convertToBuddhistYear(dateKey));
+
+  const dailyTemperatureAvg = labels.map((label) => {
+    const dateKey = currentWeek[labels.indexOf(label)];
+    const temperatureData = dailyData[dateKey]?.temperature || [];
+    return temperatureData.length ? averageData(temperatureData) : 0;
   });
 
-  // อัปเดตกราฟ
+  const dailyHumidityAvg = labels.map((label) => {
+    const dateKey = currentWeek[labels.indexOf(label)];
+    const humidityData = dailyData[dateKey]?.humidity || [];
+    return humidityData.length ? averageData(humidityData) : 0;
+  });
+
+  const dailySmokeAvg = labels.map((label) => {
+    const dateKey = currentWeek[labels.indexOf(label)];
+    const smokeData = dailyData[dateKey]?.smoke || [];
+    return smokeData.length ? averageData(smokeData) : 0;
+  });
+
   updateBarChart(labels, dailyHumidityAvg, dailyTemperatureAvg, dailySmokeAvg);
 });
 
-function averageDailyData(data) {
+// ============================
+function averageData(data) {
   const sum = data.reduce((acc, value) => acc + value, 0);
-  return data.length ? sum / data.length : 0;
+  return sum / data.length;
 }
 
 function parseTimestamp(timestamp) {
-  const [datePart, timePart] = timestamp.split(" "); // แยกวันที่และเวลา
-  const [day, month, year] = datePart.split("-"); // แยกส่วนของวันที่
+  const [datePart, timePart] = timestamp.split(" "),
+    [day, month, year] = datePart.split("-");
   return new Date(`${year}-${month}-${day}T${timePart}`);
 }
 
-function convertToBuddhistYear(dateString) {
-  const date = new Date(dateString); // แปลงเป็น Date object
-  const day = String(date.getDate()).padStart(2, "0");
-  const month = String(date.getMonth() + 1).padStart(2, "0"); // เดือนเริ่มจาก 0
-  const year = date.getFullYear() + 543; // แปลงเป็น พ.ศ.
-  return `${day}/${month}/${year}`;
+function getWeekFromDate(date) {
+  const selectedDate = new Date(date);
+  const dayOfWeek = selectedDate.getDay(); // คำนวณวันของสัปดาห์
+  const diff = selectedDate.getDate() - dayOfWeek; // แก้ไขให้เริ่มจากวันอาทิตย์
+  selectedDate.setDate(diff); // กำหนดวันที่เริ่มต้นสัปดาห์เป็นวันอาทิตย์
+  return Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(selectedDate);
+    d.setDate(selectedDate.getDate() + i); // เพิ่มวันที่ตามลำดับ
+    return d.toISOString().split("T")[0]; // แปลงเป็นรูปแบบ YYYY-MM-DD
+  });
 }
 
+function convertToBuddhistYear(dateString) {
+  const date = new Date(dateString),
+    day = String(date.getDate()).padStart(2, "0"),
+    month = String(date.getMonth() + 1).padStart(2, "0"), // เดือนเริ่มจาก 0
+    year = date.getFullYear() + 543;
+  return `${day}/${month}/${year}`;
+}

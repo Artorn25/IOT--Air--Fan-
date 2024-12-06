@@ -19,8 +19,8 @@ function updateLineChart(timestamps, humidityData, temperatureData, smokeData) {
             label: "Temperature (°C)",
             data: temperatureData,
             borderColor: "rgba(255, 165, 0, 1)",
-            backgroundColor: "transparent", // No background fill
-            fill: false, // Disable the background fill
+            backgroundColor: "transparent", 
+            fill: false, 
             tension: 0.3,
             borderWidth: 3,
             pointStyle: "circle",
@@ -28,23 +28,22 @@ function updateLineChart(timestamps, humidityData, temperatureData, smokeData) {
             pointBackgroundColor: "rgba(255, 165, 0, 1)",
           },
           {
-            label: "Humidity (%)",
+            label: "Humidity (RH)",
             data: humidityData,
             borderColor: "rgba(30, 144, 255, 1)",
-            backgroundColor: "transparent", // No background fill
-            fill: false, // Disable the background fill
-            tension: 0.3,
+            backgroundColor: "transparent", 
+            fill: false, 
             borderWidth: 3,
             pointStyle: "circle",
             pointRadius: 5,
             pointBackgroundColor: "rgba(30, 144, 255, 1)",
           },
           {
-            label: "Smoke Level",
+            label: "Smoke Level (µg/m³)",
             data: smokeData,
             borderColor: "rgba(138, 43, 226, 1)",
-            backgroundColor: "transparent", // No background fill
-            fill: false, // Disable the background fill
+            backgroundColor: "transparent", 
+            fill: false, 
             tension: 0.3,
             borderWidth: 3,
             pointStyle: "circle",
@@ -153,7 +152,7 @@ function updateBarChart(
             hoverBackgroundColor: "rgba(255, 165, 0, 0.8)",
           },
           {
-            label: "Average Humidity (%)",
+            label: "Average Humidity (RH)",
             data: dailyHumidityAvg,
             backgroundColor: "rgba(30, 144, 255, 0.6)",
             borderColor: "rgba(30, 144, 255, 1)",
@@ -161,7 +160,7 @@ function updateBarChart(
             hoverBackgroundColor: "rgba(30, 144, 255, 0.8)",
           },
           {
-            label: "Average Smoke Level",
+            label: "Average Smoke Level (µg/m³)",
             data: dailySmokeAvg,
             backgroundColor: "rgba(138, 43, 226, 0.6)",
             borderColor: "rgba(138, 43, 226, 1)",
