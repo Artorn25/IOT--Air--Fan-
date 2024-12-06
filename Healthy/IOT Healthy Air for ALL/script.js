@@ -19,8 +19,8 @@ function updateLineChart(timestamps, humidityData, temperatureData, smokeData) {
             label: "Temperature (°C)",
             data: temperatureData,
             borderColor: "rgba(255, 165, 0, 1)",
-            backgroundColor: "transparent", 
-            fill: false, 
+            backgroundColor: "transparent",
+            fill: false,
             tension: 0.3,
             borderWidth: 3,
             pointStyle: "circle",
@@ -31,8 +31,8 @@ function updateLineChart(timestamps, humidityData, temperatureData, smokeData) {
             label: "Humidity (RH)",
             data: humidityData,
             borderColor: "rgba(30, 144, 255, 1)",
-            backgroundColor: "transparent", 
-            fill: false, 
+            backgroundColor: "transparent",
+            fill: false,
             borderWidth: 3,
             pointStyle: "circle",
             pointRadius: 5,
@@ -42,8 +42,8 @@ function updateLineChart(timestamps, humidityData, temperatureData, smokeData) {
             label: "Smoke Level (µg/m³)",
             data: smokeData,
             borderColor: "rgba(138, 43, 226, 1)",
-            backgroundColor: "transparent", 
-            fill: false, 
+            backgroundColor: "transparent",
+            fill: false,
             tension: 0.3,
             borderWidth: 3,
             pointStyle: "circle",
@@ -219,6 +219,7 @@ function updateBarChart(
     barChartInstance.data.datasets[1].data = dailyHumidityAvg;
     barChartInstance.data.datasets[2].data = dailySmokeAvg;
     barChartInstance.update();
+    console.log("Chart updated with new data");
   }
 }
 
@@ -236,3 +237,23 @@ function updateDateTime() {
 setInterval(updateDateTime, 1000);
 
 updateDateTime();
+
+function getWeekFromDate(date) {
+  const selectedDate = new Date(date);
+  const dayOfWeek = selectedDate.getDay(); // คำนวณวันในสัปดาห์ (0 = อาทิตย์, 1 = จันทร์, ...)
+  const diff = selectedDate.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1); // เริ่มต้นจากวันจันทร์
+  selectedDate.setDate(diff); // กำหนดวันที่เริ่มต้นสัปดาห์เป็นวันจันทร์
+  return Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(selectedDate);
+    d.setDate(selectedDate.getDate() + i); // เพิ่มวันที่ทีละวันในสัปดาห์
+    return d.toISOString().split("T")[0]; // แปลงเป็นรูปแบบ YYYY-MM-DD
+  });
+}
+
+function convertToBuddhistYear(dateString) {
+  const date = new Date(dateString),
+    day = String(date.getDate()).padStart(2, "0"),
+    month = String(date.getMonth() + 1).padStart(2, "0"), // เดือนเริ่มจาก 0
+    year = date.getFullYear() + 543;
+  return `${day}/${month}/${year}`;
+}

@@ -77,7 +77,7 @@
           <a
             href="#"
             class="icon text-white hover:text-orange-500 transition-colors duration-300 flex items-center space-x-3"
-            onclick="open_Modal_Setting()"
+            onclick="openModalSetting()"
           >
             <i class="fas fa-cog text-2xl"></i>
             <span class="text-sm lg:text-base">Settings</span>
@@ -96,7 +96,7 @@
           <a
             href="#"
             class="icon text-white hover:text-blue-500 transition-colors duration-300 flex items-center space-x-3 mt-4"
-            onclick="open_Modal_About()"
+            onclick="openModalAbout()"
           >
             <i class="fas fa-info-circle text-2xl"></i>
             <span class="text-sm lg:text-base">About</span>
@@ -139,7 +139,7 @@
           <a
             href="#"
             class="icon text-white hover:text-orange-500 transition-colors duration-300 flex items-center space-x-3"
-            onclick="open_Modal_Setting()"
+            onclick="openModalSetting()"
           >
             <i class="fas fa-cog text-2xl"></i>
             <span class="text-sm lg:text-base">Settings</span>
@@ -158,7 +158,7 @@
           <a
             href="#"
             class="icon text-white hover:text-blue-500 transition-colors duration-300 flex items-center space-x-3 mt-4"
-            onclick="open_Modal_About()"
+            onclick="openModalAbout()"
           >
             <i class="fas fa-info-circle text-2xl"></i>
             <span class="text-sm lg:text-base">About</span>
@@ -332,7 +332,7 @@
         </p>
         <div class="mt-4 flex justify-end">
           <button
-            onclick="close_Modal_About()"
+            onclick="closeModalAbout()"
             class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
           >
             Close
@@ -345,16 +345,53 @@
       id="modal_setting"
       class="fixed inset-0 bg-gray-500 bg-opacity-75 flex justify-center items-center hidden z-20"
     >
-      <div class="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full">
-        <h2 class="text-xl font-semibold text-gray-700">Setting</h2>
-        <p class="mt-2 text-gray-600">
-          This is an example modal_about popup. You can provide information
-          here.
+      <div class="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+        <h2 class="text-2xl font-bold text-gray-800">Setting</h2>
+        <p class="mt-3 text-gray-600">
+          Customize your preferences here. Adjust the settings as needed.
         </p>
-        <div class="mt-4 flex justify-end">
+
+        <!-- ตัวเลือกการตั้งค่า -->
+        <div class="mt-4 space-y-4">
+          <div>
+            <label for="themeSelect" class="block text-gray-700 font-medium">
+              Theme:
+            </label>
+            <select
+              id="themeSelect"
+              class="mt-1 w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
+            >
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+              <option value="system">System Default</option>
+            </select>
+          </div>
+          <div>
+            <label for="languageSelect" class="block text-gray-700 font-medium">
+              Language:
+            </label>
+            <select
+              id="languageSelect"
+              class="mt-1 w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
+            >
+              <option value="en">English</option>
+              <option value="th">ภาษาไทย</option>
+              <option value="es">Español</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- ปุ่มจัดการ -->
+        <div class="mt-6 flex justify-end gap-4">
           <button
-            onclick="close_Modal_Setting()"
-            class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+            onclick="saveSettings()"
+            class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600"
+          >
+            Save
+          </button>
+          <button
+            onclick="closeModalSetting()"
+            class="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"
           >
             Close
           </button>
@@ -369,39 +406,56 @@
         menuItems.classList.toggle("hidden");
       });
 
-      function open_Modal_About() {
+      function openModalAbout() {
         document.getElementById("modal_about").classList.remove("hidden");
       }
 
-      function close_Modal_About() {
+      function closeModalAbout() {
         document.getElementById("modal_about").classList.add("hidden");
       }
 
-      function open_Modal_Setting() {
+      function openModalSetting() {
         document.getElementById("modal_setting").classList.remove("hidden");
       }
 
-      function close_Modal_Setting() {
+      function closeModalSetting() {
         document.getElementById("modal_setting").classList.add("hidden");
       }
 
-      function setCurrentDate() {
+      // บันทึกการตั้งค่า
+      function saveSettings() {
+        const theme = document.getElementById("themeSelect").value;
+        const language = document.getElementById("languageSelect").value;
+
+        console.log("Theme:", theme);
+        console.log("Language:", language);
+
+        // ปิด Modal หลังบันทึก
+        closeModalSetting();
+      }
+      function setThaiDate() {
         const today = new Date();
 
-        const options = {
-          timeZone: "Asia/Bangkok",
-          year: "numeric",
-          month: "2-digit",
-          day: "2-digit",
-        };
-        const thaiDate = today.toLocaleString("en-GB", options); // ใช้ 'en-GB' เพื่อให้ได้รูปแบบ dd/mm/yyyy
+        // คำนวณ timezone ไทย (GMT+7)
+        const thailandOffset = 7 * 60 * 60 * 1000; // 7 ชั่วโมงในหน่วยมิลลิวินาที
+        const thaiTime = new Date(today.getTime() + thailandOffset);
 
-        const formattedDate = thaiDate.split("/").reverse().join("-"); // แปลง dd/mm/yyyy เป็น yyyy-mm-dd
+        // ปรับปี ค.ศ. เป็น พ.ศ.
+        const thaiYear = thaiTime.getFullYear() + 543;
 
+        // สร้างวันที่ในรูปแบบ yyyy-mm-dd
+        const formattedDate = [
+          thaiYear,
+          String(thaiTime.getMonth() + 1).padStart(2, "0"), // เดือนเริ่มนับจาก 0
+          String(thaiTime.getDate()).padStart(2, "0"),
+        ].join("-");
+
+        // ตั้งค่าลงใน input
         document.getElementById("datePicker").value = formattedDate;
       }
 
-      setCurrentDate();
+      // เรียกฟังก์ชันเมื่อโหลดหน้าเว็บ
+      setThaiDate();
     </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="/Healthy/IOT Healthy Air for ALL/script.js"></script>

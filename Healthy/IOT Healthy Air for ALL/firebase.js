@@ -123,7 +123,6 @@ onValue(limitedQuery, (snapshot) => {
     accumulatedTime = 0;
   }
 
-  // คำนวณค่าเฉลี่ย
   const labels = currentWeek.map((dateKey) => convertToBuddhistYear(dateKey));
 
   const dailyTemperatureAvg = labels.map((label) => {
@@ -157,24 +156,4 @@ function parseTimestamp(timestamp) {
   const [datePart, timePart] = timestamp.split(" "),
     [day, month, year] = datePart.split("-");
   return new Date(`${year}-${month}-${day}T${timePart}`);
-}
-
-function getWeekFromDate(date) {
-  const selectedDate = new Date(date);
-  const dayOfWeek = selectedDate.getDay(); // คำนวณวันของสัปดาห์
-  const diff = selectedDate.getDate() - dayOfWeek; // แก้ไขให้เริ่มจากวันอาทิตย์
-  selectedDate.setDate(diff); // กำหนดวันที่เริ่มต้นสัปดาห์เป็นวันอาทิตย์
-  return Array.from({ length: 7 }, (_, i) => {
-    const d = new Date(selectedDate);
-    d.setDate(selectedDate.getDate() + i); // เพิ่มวันที่ตามลำดับ
-    return d.toISOString().split("T")[0]; // แปลงเป็นรูปแบบ YYYY-MM-DD
-  });
-}
-
-function convertToBuddhistYear(dateString) {
-  const date = new Date(dateString),
-    day = String(date.getDate()).padStart(2, "0"),
-    month = String(date.getMonth() + 1).padStart(2, "0"), // เดือนเริ่มจาก 0
-    year = date.getFullYear() + 543;
-  return `${day}/${month}/${year}`;
 }
