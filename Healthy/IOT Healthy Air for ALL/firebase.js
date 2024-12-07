@@ -97,6 +97,9 @@ onValue(limitedQuery, (snapshot) => {
   document.getElementById("temp").innerHTML = `${parseInt(
     temperatureData[temperatureData.length - 1]
   )} °C`;
+  if (parseInt(temperatureData[temperatureData.length - 1]) >= 30)
+    alert("Fan is on"), console.log("Fan is on");
+  else console.log("Fan is off");
   document.getElementById("humid").innerHTML = `${parseInt(
     humidityData[humidityData.length - 1]
   )} RH`;
