@@ -28,46 +28,47 @@ let currentPage = 1; // หน้าปัจจุบัน
 const itemsPerPage = 200; // จำนวนข้อมูลต่อหน้า
 
 onValue(dataRef, (snapshot) => {
-    const data = snapshot.val();
-    if (data) {
-      // แปลงข้อมูลที่ดึงมาจาก Firebase
-      rawData = Object.values(data).map((item) => ({
-        timestamp: item.timestamp || "0",
-        temperature: item.temperature ?? 0,
-        smoke_level: item.smoke_level ?? 0,
-        humidity: item.humidity ?? 0,
-      }));
-  
-      // ฟังก์ชันแปลง timestamp เป็น Date object
-      const parseTimestamp = (timestamp) => {
-        const parts = timestamp.split(' '); // แยกวันที่และเวลา
-        const dateParts = parts[0].split('-'); // แยกวัน, เดือน, ปี
-        const timeParts = parts[1].split(':'); // แยกชั่วโมง, นาที, วินาที
-  
-        // สร้าง Date object จากวันที่และเวลา
-        return new Date(
-          parseInt(dateParts[2]), // ปี
-          parseInt(dateParts[1]) - 1, // เดือน (เดือนใน JavaScript เริ่มจาก 0)
-          parseInt(dateParts[0]), // วัน
-          parseInt(timeParts[0]), // ชั่วโมง
-          parseInt(timeParts[1]), // นาที
-          parseInt(timeParts[2])  // วินาที
-        );
-      };
-  
-      // จัดเรียงข้อมูลใหม่จากล่าสุดไปเก่า (จากใหม่ไปเก่า)
-      rawData.sort((a, b) => parseTimestamp(b.timestamp) - parseTimestamp(a.timestamp));
-  
-      // กำหนดให้ filteredData เป็นข้อมูลที่ถูกกรองแล้ว
-      filteredData = [...rawData];
-      renderTable(); // เรียกใช้ฟังก์ชัน renderTable เพื่อแสดงข้อมูล
-    } else {
-      document.getElementById("table-output").innerHTML = `
+  const data = snapshot.val();
+  if (data) {
+    // แปลงข้อมูลที่ดึงมาจาก Firebase
+    rawData = Object.values(data).map((item) => ({
+      timestamp: item.timestamp || "0",
+      temperature: item.temperature ?? 0,
+      smoke_level: item.smoke_level ?? 0,
+      humidity: item.humidity ?? 0,
+    }));
+
+    // ฟังก์ชันแปลง timestamp เป็น Date object
+    const parseTimestamp = (timestamp) => {
+      const parts = timestamp.split(" "); // แยกวันที่และเวลา
+      const dateParts = parts[0].split("-"); // แยกวัน, เดือน, ปี
+      const timeParts = parts[1].split(":"); // แยกชั่วโมง, นาที, วินาที
+
+      // สร้าง Date object จากวันที่และเวลา
+      return new Date(
+        parseInt(dateParts[2]), // ปี
+        parseInt(dateParts[1]) - 1, // เดือน (เดือนใน JavaScript เริ่มจาก 0)
+        parseInt(dateParts[0]), // วัน
+        parseInt(timeParts[0]), // ชั่วโมง
+        parseInt(timeParts[1]), // นาที
+        parseInt(timeParts[2]) // วินาที
+      );
+    };
+
+    // จัดเรียงข้อมูลใหม่จากล่าสุดไปเก่า (จากใหม่ไปเก่า)
+    rawData.sort(
+      (a, b) => parseTimestamp(b.timestamp) - parseTimestamp(a.timestamp)
+    );
+
+    // กำหนดให้ filteredData เป็นข้อมูลที่ถูกกรองแล้ว
+    filteredData = [...rawData];
+    renderTable(); // เรียกใช้ฟังก์ชัน renderTable เพื่อแสดงข้อมูล
+  } else {
+    document.getElementById("table-output").innerHTML = `
         <p class="text-red-500 text-center py-6">ไม่มีข้อมูลใน Firebase</p>
       `;
-    }
-  });
-  
+  }
+});
 
 function renderTable() {
   const tableDiv = document.getElementById("table-output");
@@ -152,3 +153,28 @@ searchInput.addEventListener("input", () => {
   currentPage = 1; // เริ่มที่หน้าแรกเมื่อค้นหาใหม่
   renderTable(); // แสดงข้อมูลที่กรองแล้ว
 });
+
+// const filterSelect = document.getElementById('filter-select');
+
+// // ฟังก์ชันกรองข้อมูล
+// searchInput.addEventListener('input', () => {
+//   const filterValue = filterSelect.value;
+//   const searchValue = searchInput.value.toLowerCase();
+
+//   // สมมติว่า data คือข้อมูลที่คุณต้องการกรอง
+//   const filteredData = data.filter(item => {
+//     if (filterValue === 'timestamp') {
+//       return item.timestamp.toLowerCase().includes(searchValue);
+//     } else if (filterValue === 'temperature') {
+//       return item.temperature.toLowerCase().includes(searchValue);
+//     } else if (filterValue === 'smoke_level') {
+//       return item.smoke_level.toLowerCase().includes(searchValue);
+//     } else if (filterValue === 'humidity') {
+//       return item.humidity.toLowerCase().includes(searchValue);
+//     }
+//     return false;
+//   });
+
+//   // แสดงผลข้อมูลที่กรองแล้ว (อาจจะใช้การแสดงผลในตาราง)
+//   displayData(filteredData);
+// });

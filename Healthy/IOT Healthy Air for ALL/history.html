@@ -99,7 +99,7 @@
 
           <!-- History -->
           <a
-            href="#"
+            href="/Healthy/IOT Healthy Air for ALL/history.html"
             class="icon text-white hover:text-pink-500 transition-colors duration-300 flex items-center space-x-3"
           >
             <i class="fas fa-clock text-2xl"></i>
@@ -225,13 +225,22 @@
           </div>
         </header>
         <div class="flex flex-col sm:flex-row justify-between items-center my-4 px-4 sm:px-6 md:px-8">
-          <!-- Search Input -->
-          <input 
-            id="search-input" 
-            type="text" 
-            class="w-full sm:w-3/4 lg:w-1/2 px-6 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-300 ease-in-out placeholder-gray-400 text-gray-800 mb-4 sm:mb-0"
-            placeholder="Search by timestamp, temperature, smoke level or humidity"
-          />
+          <!-- Filter Selection -->
+          <div class="flex space-x-4 mb-4 sm:mb-0">
+            <select id="filter-select" class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+              <option value="timestamp">Timestamp</option>
+              <option value="temperature">Temperature</option>
+              <option value="smoke_level">Smoke Level</option>
+              <option value="humidity">Humidity</option>
+            </select>
+            
+            <input 
+              id="search-input" 
+              type="text" 
+              class="w-full sm:w-3/4 lg:w-1/2 px-6 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-300 ease-in-out placeholder-gray-400 text-gray-800"
+              placeholder="Search..."
+            />
+          </div>
           
           <!-- Pagination Controls -->
           <div class="flex items-center space-x-4">
