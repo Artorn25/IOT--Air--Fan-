@@ -97,9 +97,22 @@ onValue(limitedQuery, (snapshot) => {
   document.getElementById("temp").innerHTML = `${parseInt(
     temperatureData[temperatureData.length - 1]
   )} °C`;
-  if (parseInt(temperatureData[temperatureData.length - 1]) >= 30)
-    alert("Fan is on"), console.log("Fan is on");
-  else console.log("Fan is off");
+  if (parseInt(temperatureData[temperatureData.length - 1]) >= 30) {
+    if (Notification.permission === "granted") {
+      new Notification("Fan is on", {
+        body: `The temperature is ${parseInt(
+          temperatureData[temperatureData.length - 1]
+        )} °C.`,
+        icon: "/Healthy/IOT Healthy Air for ALL/images/warning.png",
+      });
+    } else {
+      console.log("Notification permission not granted.");
+    }
+    console.log("Fan is on");
+  } else {
+    console.log("Fan is off");
+  }
+
   document.getElementById("humid").innerHTML = `${parseInt(
     humidityData[humidityData.length - 1]
   )} RH`;
