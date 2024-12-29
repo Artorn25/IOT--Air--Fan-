@@ -5,7 +5,6 @@ import {
   onValue,
 } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
 
-// ตั้งค่าการเชื่อมต่อ Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyCsLbgaIiGDIFSOFS79BhfjgfZNjJixk2Y",
   authDomain: "esp8266project-2ce1e.firebaseapp.com",
@@ -154,27 +153,3 @@ searchInput.addEventListener("input", () => {
   renderTable(); // แสดงข้อมูลที่กรองแล้ว
 });
 
-// const filterSelect = document.getElementById('filter-select');
-
-// // ฟังก์ชันกรองข้อมูล
-// searchInput.addEventListener('input', () => {
-//   const filterValue = filterSelect.value;
-//   const searchValue = searchInput.value.toLowerCase();
-
-//   // สมมติว่า data คือข้อมูลที่คุณต้องการกรอง
-//   const filteredData = data.filter(item => {
-//     if (filterValue === 'timestamp') {
-//       return item.timestamp.toLowerCase().includes(searchValue);
-//     } else if (filterValue === 'temperature') {
-//       return item.temperature.toLowerCase().includes(searchValue);
-//     } else if (filterValue === 'smoke_level') {
-//       return item.smoke_level.toLowerCase().includes(searchValue);
-//     } else if (filterValue === 'humidity') {
-//       return item.humidity.toLowerCase().includes(searchValue);
-//     }
-//     return false;
-//   });
-
-//   // แสดงผลข้อมูลที่กรองแล้ว (อาจจะใช้การแสดงผลในตาราง)
-//   displayData(filteredData);
-// });
