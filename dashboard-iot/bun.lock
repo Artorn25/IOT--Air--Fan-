@@ -22,6 +22,7 @@
       "devDependencies": {
         "@eslint/eslintrc": "^3",
         "@tailwindcss/postcss": "^4",
+        "@types/aos": "^3.0.7",
         "@types/node": "^24.0.1",
         "@types/react": "^19.1.8",
         "@types/react-dom": "^19.1.6",
@@ -314,6 +315,8 @@
     "@tailwindcss/postcss": ["@tailwindcss/postcss@4.1.8", "", { "dependencies": { "@alloc/quick-lru": "^5.2.0", "@tailwindcss/node": "4.1.8", "@tailwindcss/oxide": "4.1.8", "postcss": "^8.4.41", "tailwindcss": "4.1.8" } }, "sha512-vB/vlf7rIky+w94aWMw34bWW1ka6g6C3xIOdICKX2GC0VcLtL6fhlLiafF0DVIwa9V6EHz8kbWMkS2s2QvvNlw=="],
 
     "@tybys/wasm-util": ["@tybys/wasm-util@0.9.0", "", { "dependencies": { "tslib": "^2.4.0" } }, "sha512-6+7nlbMVX/PVDCwaIQ8nTOPveOcFLSt8GcXdx8hD0bt39uWxYT88uXzqTd4fTvqta7oeUJqudepapKNt2DYJFw=="],
+
+    "@types/aos": ["@types/aos@3.0.7", "", {}, "sha512-sEhyFqvKauUJZDbvAB3Pggynrq6g+2PS4XB3tmUr+mDL1gfDJnwslUC4QQ7/l8UD+LWpr3RxZVR/rHoZrLqZVg=="],
 
     "@types/chart.js": ["@types/chart.js@4.0.1", "", { "dependencies": { "chart.js": "*" } }, "sha512-OwXJ6Eg14eFpCsTG6sljiGnvVpit5R9rapG7nwDnQlljsdplVIOYVuCSwy07IduCtihrOwvOnbhXKLyp3nvPcw=="],
 
