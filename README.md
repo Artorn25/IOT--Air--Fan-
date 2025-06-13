@@ -1,10 +1,10 @@
-# IOT--Air--Fan
+# 🌫IOT--Air--Fan 
 
 This project is an IoT-based air fan system designed to monitor air quality and control fan operation based on environmental conditions. The system collects data from various sensors and sends it to a web application, which provides a dashboard for real-time monitoring and historical data visualization. Firebase is used as the database to support real-time data updates, ensuring a responsive and user-friendly experience.
 
 The microcontroller (Node MCU ESP8266) is responsible for processing sensor data and requires a stable WiFi connection to send data to the Firebase database and enable communication with the web application.
 
-## Accessories
+## 📦 Accessories & Components
 
 - **Node MCU ESP8266 V.2**: The main microcontroller for connecting to WiFi and managing the system.
 - **Shield Nodemcu AB-Maker V1.3 For Nodemcu Esp8266 V2**: Provides an easier way to connect components to the Node MCU ESP8266 with fewer wiring issues.
@@ -15,7 +15,7 @@ The microcontroller (Node MCU ESP8266) is responsible for processing sensor data
 - **Adapter 9V**: Powers the system components.
 - **Jumper Wires**: For connecting the components to the microcontroller.
 
-## Features
+## 🚀 Features
 
 - **Real-Time Monitoring**: Displays temperature, humidity, and air quality data on a web application dashboard.
 - **WiFi Connectivity**: The microcontroller connects to a WiFi network to send data to Firebase and communicate with the web application.
@@ -24,14 +24,14 @@ The microcontroller (Node MCU ESP8266) is responsible for processing sensor data
 - **Firebase Integration**: Ensures real-time data updates and storage for seamless user interaction.
 - **Web Dashboard**: A visually appealing and interactive web interface to monitor and manage the system.
 
-## Benefits
+## 🎯 Benefits
 
 - **Improved Air Quality**: Ensures optimal air quality in the environment by activating the fan when needed.
 - **Energy Efficiency**: Operates the fan only when required, reducing energy consumption.
 - **Data Insights**: Offers valuable insights into air quality trends over time.
 - **Scalability**: Can be expanded with additional sensors or features as needed.
 
-## How to Use
+## 🛠️ How to Use
 
 1. **Hardware Setup**: 
    - Assemble all components using the shield and connect them as per the circuit diagram.
@@ -53,11 +53,7 @@ The microcontroller (Node MCU ESP8266) is responsible for processing sensor data
    - Access the web dashboard using a browser to monitor live data.
    - Use the interface to view historical data and system status.
 
-6. **Power On**: 
-   - Power the system using the Adapter 9V.
-   - The system will automatically start collecting and sending data to Firebase.
-
-## System Architecture
+## 🧱 System Architecture
 
 The system architecture is designed to ensure seamless data flow and operation:
 
@@ -70,4 +66,14 @@ The system architecture is designed to ensure seamless data flow and operation:
 
 ---
 
+## 🔐 Test Credentials
+
+Use the following credentials to log in and test the system:
+
+- **Email:** `test@example.com`  
+- **Password:** `Password123`
 This document provides a comprehensive overview of the project, guiding users through the setup and operation process. If you have further questions or encounter issues, feel free to contact the project maintainers.
+
+### Email login test
+ email: test@example.com
+ password: Password123
