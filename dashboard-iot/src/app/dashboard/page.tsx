@@ -1,22 +1,15 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faBars,
-  faHome,
-  faCog,
-  faClock,
-  faInfoCircle,
-  faSignOutAlt,
-  faSearch,
   faThermometerHalf,
   faSmog,
   faTint,
 } from "@fortawesome/free-solid-svg-icons";
+import Header from "../components/Header";
+import Sidebar from "../components/Sidebar";
+import Model from "../components/Model";
 import Script from "next/script";
 import { SensorData, generateMockData } from "../lib/MockData";
 import { db } from "../lib/firebase";
@@ -47,20 +40,47 @@ ChartJS.register(
   Legend
 );
 
+const translations = {
+  en: {
+    title: "Healthy Air for All",
+    history: "History",
+    temperature: "Temperature",
+    dust: "Dust Density",
+    humidity: "Humidity",
+  },
+  th: {
+    title: "Healthy Air for All",
+    history: "ประวัติ",
+    temperature: "อุณหภูมิ",
+    dust: "ความหนาแน่นฝุ่น",
+    humidity: "ความชื้น",
+  },
+};
+
 export default function Dashboard() {
-  const router = useRouter();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [theme, setTheme] = useState("light"); // ค่าเริ่มต้นคงที่สำหรับ SSR
+  const [language, setLanguage] = useState<"en" | "th">("en"); // ค่าเริ่มต้นคงที่สำหรับ SSR
   const [isAboutModalOpen, setIsAboutModalOpen] = useState(false);
   const [isSettingModalOpen, setIsSettingModalOpen] = useState(false);
-  const [theme, setTheme] = useState("light");
-  const [language, setLanguage] = useState("en");
-  const [date, setDate] = useState("");
   const [temperature, setTemperature] = useState(0);
   const [humidity, setHumidity] = useState(0);
   const [dust, setDust] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const lineChartInstance = useRef<ChartJS | null>(null);
   const barChartInstance = useRef<ChartJS | null>(null);
+
+  // ซิงค์ theme และ language จาก localStorage หลัง hydration
+  useEffect(() => {
+    const savedTheme =
+      typeof window !== "undefined" ? localStorage.getItem("theme") : null;
+    if (savedTheme) setTheme(savedTheme);
+
+    const savedLanguage =
+      typeof window !== "undefined"
+        ? (localStorage.getItem("language") as "en" | "th")
+        : null;
+    if (savedLanguage) setLanguage(savedLanguage);
+  }, []);
 
   // Apply theme to document
   useEffect(() => {
@@ -69,7 +89,16 @@ export default function Dashboard() {
     } else {
       document.documentElement.classList.remove("dark");
     }
+    if (typeof window !== "undefined") {
+      localStorage.setItem("theme", theme);
+    }
   }, [theme]);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("language", language);
+    }
+  }, [language]);
 
   const updateLineChart = (
     timestamps: string[],
@@ -86,7 +115,10 @@ export default function Dashboard() {
     const ctxLine = (
       document.getElementById("lineChart") as HTMLCanvasElement | null
     )?.getContext("2d");
-    if (!ctxLine) return;
+    if (!ctxLine) {
+      console.error("Line chart canvas not found");
+      return;
+    }
 
     if (!lineChartInstance.current) {
       lineChartInstance.current = new ChartJS(ctxLine, {
@@ -95,7 +127,7 @@ export default function Dashboard() {
           labels: timestamps,
           datasets: [
             {
-              label: "Temperature (°C)",
+              label: translations[language].temperature + " (°C)",
               data: temperatureData,
               borderColor: "rgba(255, 165, 0, 1)",
               backgroundColor: "transparent",
@@ -107,7 +139,7 @@ export default function Dashboard() {
               pointBackgroundColor: "rgba(255, 165, 0, 1)",
             },
             {
-              label: "Humidity (RH)",
+              label: translations[language].humidity + " (RH)",
               data: humidityData,
               borderColor: "rgba(30, 144, 255, 1)",
               backgroundColor: "transparent",
@@ -118,7 +150,7 @@ export default function Dashboard() {
               pointBackgroundColor: "rgba(30, 144, 255, 1)",
             },
             {
-              label: "Smoke Level (µg/m³)",
+              label: translations[language].dust + " (µg/m³)",
               data: smokeData,
               borderColor: "rgba(138, 43, 226, 1)",
               backgroundColor: "transparent",
@@ -204,7 +236,10 @@ export default function Dashboard() {
     const ctxBar = (
       document.getElementById("barChart") as HTMLCanvasElement | null
     )?.getContext("2d");
-    if (!ctxBar) return;
+    if (!ctxBar) {
+      console.error("Bar chart canvas not found");
+      return;
+    }
 
     if (!barChartInstance.current) {
       barChartInstance.current = new ChartJS(ctxBar, {
@@ -213,7 +248,7 @@ export default function Dashboard() {
           labels,
           datasets: [
             {
-              label: "Average Temperature (°C)",
+              label: "Average " + translations[language].temperature + " (°C)",
               data: dailyTemperatureAvg,
               backgroundColor: "rgba(255, 165, 0, 0.6)",
               borderColor: "rgba(255, 165, 0, 1)",
@@ -221,7 +256,7 @@ export default function Dashboard() {
               hoverBackgroundColor: "rgba(255, 165, 0, 0.8)",
             },
             {
-              label: "Average Humidity (RH)",
+              label: "Average " + translations[language].humidity + " (RH)",
               data: dailyHumidityAvg,
               backgroundColor: "rgba(30, 144, 255, 0.6)",
               borderColor: "rgba(30, 144, 255, 1)",
@@ -229,7 +264,7 @@ export default function Dashboard() {
               hoverBackgroundColor: "rgba(30, 144, 255, 0.8)",
             },
             {
-              label: "Average Smoke Level (µg/m³)",
+              label: "Average " + translations[language].dust + " (µg/m³)",
               data: dailySmokeAvg,
               backgroundColor: "rgba(138, 43, 226, 0.6)",
               borderColor: "rgba(138, 43, 226, 1)",
@@ -287,25 +322,58 @@ export default function Dashboard() {
       return [];
     }
     const dayOfWeek = selectedDate.getDay();
-    const diff = selectedDate.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
+    const diff =
+      selectedDate.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
     selectedDate.setDate(diff);
     return Array.from({ length: 7 }, (_, i) => {
       const d = new Date(selectedDate);
       d.setDate(selectedDate.getDate() + i);
-      return d.toISOString().split("T")[0];
+      return new Intl.DateTimeFormat("en-CA", {
+        timeZone: "Asia/Bangkok",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      }).format(d);
     });
   };
 
   const convertToBuddhistYear = (dateString: string) => {
     const date = new Date(dateString);
     if (isNaN(date.getTime())) {
-      console.error(`Invalid date provided to convertToBuddhistYear: ${dateString}`);
+      console.error(
+        `Invalid date provided to convertToBuddhistYear: ${dateString}`
+      );
       return dateString;
     }
-    const day = String(date.getDate()).padStart(2, "0");
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const year = date.getFullYear() + 543;
-    return `${day}/${month}/${year}`;
+    const thaiDate = new Intl.DateTimeFormat("th-TH", {
+      timeZone: "Asia/Bangkok",
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    }).formatToParts(date);
+
+    let day = "";
+    let month = "";
+    let year = "";
+
+    thaiDate.forEach((part) => {
+      switch (part.type) {
+        case "day":
+          day = part.value;
+          break;
+        case "month":
+          month = part.value;
+          break;
+        case "year":
+          year = part.value;
+          break;
+        default:
+          break;
+      }
+    });
+
+    const buddhistYear = parseInt(year);
+    return `${day}/${month}/${buddhistYear}`;
   };
 
   const averageData = (data: number[]) => {
@@ -316,27 +384,14 @@ export default function Dashboard() {
   const parseTimestamp = (timestamp: string) => {
     const [datePart, timePart] = timestamp.split(" ");
     const [year, month, day] = datePart.split("-");
-    return new Date(`${year}-${month}-${day}T${timePart}`);
+    return new Date(`${year}-${month}-${day}T${timePart}+07:00`);
   };
 
   useEffect(() => {
-    // ตั้งค่าวันที่
-    const today = new Date();
-    const thailandOffset = 7 * 60 * 60 * 1000; // GMT+7
-    const thaiTime = new Date(today.getTime() + thailandOffset);
-    const formattedDate = [
-      thaiTime.getFullYear(),
-      String(thaiTime.getMonth() + 1).padStart(2, "0"),
-      String(thaiTime.getDate()).padStart(2, "0"),
-    ].join("-");
-    setDate(formattedDate);
-
-    // ขอสิทธิ์การแจ้งเตือน
     if (Notification.permission !== "granted") {
       Notification.requestPermission();
     }
 
-    // ดึงข้อมูลจาก Firebase
     const starCountRef = ref(db, "esp8266_data");
     const limitedQuery = query(starCountRef);
 
@@ -360,10 +415,11 @@ export default function Dashboard() {
           setDust(Math.round(mockData.smoke_level));
           updateLineChart(
             [
-              `${new Date().getHours()}:${new Date()
-                .getMinutes()
-                .toString()
-                .padStart(2, "0")}`,
+              new Intl.DateTimeFormat("th-TH", {
+                timeZone: "Asia/Bangkok",
+                hour: "2-digit",
+                minute: "2-digit",
+              }).format(new Date()),
             ],
             [mockData.humidity],
             [mockData.temperature],
@@ -385,7 +441,12 @@ export default function Dashboard() {
 
         const currentDate = new Date();
         const currentWeek = getWeekFromDate(
-          currentDate.toISOString().split("T")[0]
+          new Intl.DateTimeFormat("en-CA", {
+            timeZone: "Asia/Bangkok",
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+          }).format(currentDate)
         ).sort();
 
         for (const key in data) {
@@ -397,13 +458,19 @@ export default function Dashboard() {
             }
 
             const timestamp = parseTimestamp(entry.timestamp);
-            const dateKey = timestamp.toISOString().split("T")[0];
+            const dateKey = new Intl.DateTimeFormat("en-CA", {
+              timeZone: "Asia/Bangkok",
+              year: "numeric",
+              month: "2-digit",
+              day: "2-digit",
+            }).format(timestamp);
             results.push(entry);
             currentTimestamps.push(
-              `${timestamp.getHours()}:${timestamp
-                .getMinutes()
-                .toString()
-                .padStart(2, "0")}`
+              new Intl.DateTimeFormat("th-TH", {
+                timeZone: "Asia/Bangkok",
+                hour: "2-digit",
+                minute: "2-digit",
+              }).format(timestamp)
             );
 
             if (lastTimestamp) {
@@ -515,10 +582,11 @@ export default function Dashboard() {
         setDust(Math.round(mockData.smoke_level));
         updateLineChart(
           [
-            `${new Date().getHours()}:${new Date()
-              .getMinutes()
-              .toString()
-              .padStart(2, "0")}`,
+            new Intl.DateTimeFormat("th-TH", {
+              timeZone: "Asia/Bangkok",
+              hour: "2-digit",
+              minute: "2-digit",
+            }).format(new Date()),
           ],
           [mockData.humidity],
           [mockData.temperature],
@@ -540,169 +608,28 @@ export default function Dashboard() {
     };
   }, []);
 
-  useEffect(() => {
-    const updateDateTime = () => {
-      const now = new Date();
-      const thailandOffset = 7 * 60 * 60 * 1000; // GMT+7
-      const thaiTime = new Date(now.getTime() + thailandOffset);
-      const day = thaiTime.getDate();
-      const month = thaiTime.toLocaleString("th-TH", { month: "long" });
-      const year = thaiTime.getFullYear() + 543;
-      const time = thaiTime.toLocaleTimeString("th-TH");
-      document.getElementById(
-        "datetime"
-      )!.textContent = `วันที่: ${day} ${month} ${year} เวลา: ${time}`;
-    };
-    updateDateTime();
-    const interval = setInterval(updateDateTime, 1000);
-    return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-    if (!date) return;
-    const selectedWeek = getWeekFromDate(date).sort();
-    const labels = selectedWeek.map((dateKey) => convertToBuddhistYear(dateKey));
-    const dailyTemperatureAvg = labels.map(() => 0);
-    const dailyHumidityAvg = labels.map(() => 0);
-    const dailySmokeAvg = labels.map(() => 0);
-    updateBarChart(labels, dailyHumidityAvg, dailyTemperatureAvg, dailySmokeAvg);
-  }, [date]);
-
-  const handleLogout = () => {
-    router.push("/login");
-  };
-
-  const saveSettings = () => {
-    console.log("Theme:", theme);
-    console.log("Language:", language);
-    setIsSettingModalOpen(false);
-  };
-
   return (
     <div className="flex flex-col lg:flex-row w-screen h-screen font-sans bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
-      {/* Sidebar */}
-      <div className="sidebar flex-shrink-0 w-full lg:w-64 bg-gradient-to-b from-gray-800 to-gray-900 p-6 shadow-xl z-10">
-        <div className="lg:hidden flex items-center justify-between">
-          <button
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="text-white text-2xl hover:text-teal-400 transition-colors duration-200"
-            aria-label="Toggle menu"
-          >
-            <FontAwesomeIcon icon={faBars} />
-          </button>
-          <div className="flex items-center space-x-2">
-            <Image
-              src="/images/profile.png"
-              alt="Profile Picture"
-              width={40}
-              height={40}
-              className="rounded-full border-2 border-teal-400"
-            />
-            <span className="text-white text-sm font-medium">User</span>
-          </div>
-        </div>
-        <div className="hidden lg:flex items-center space-x-3 mt-6">
-          <Image
-            src="/images/profile.png"
-            alt="Profile Picture"
-            width={50}
-            height={50}
-            className="rounded-full border-2 border-teal-400"
-          />
-          <span className="text-white text-lg font-semibold">User</span>
-        </div>
-        <div
-          className={`${
-            isMobileMenuOpen ? "flex" : "hidden"
-          } lg:flex flex-col gap-4 mt-8`}
-        >
-          <Link
-            href="/dashboard"
-            className="flex items-center space-x-3 text-white hover:bg-gray-700 hover:text-teal-400 rounded-lg p-3 transition-all duration-200 group"
-          >
-            <FontAwesomeIcon icon={faHome} className="text-xl group-hover:scale-110 transition-transform duration-200" />
-            <span className="text-base">Home</span>
-          </Link>
-          <button
-            onClick={() => setIsSettingModalOpen(true)}
-            className="flex items-center space-x-3 text-white hover:bg-gray-700 hover:text-orange-400 rounded-lg p-3 transition-all duration-200 group text-left"
-          >
-            <FontAwesomeIcon icon={faCog} className="text-xl group-hover:scale-110 transition-transform duration-200" />
-            <span className="text-base">Settings</span>
-          </button>
-          <Link
-            href="/history"
-            className="flex items-center space-x-3 text-white hover:bg-gray-700 hover:text-pink-400 rounded-lg p-3 transition-all duration-200 group"
-          >
-            <FontAwesomeIcon icon={faClock} className="text-xl group-hover:scale-110 transition-transform duration-200" />
-            <span className="text-base">History</span>
-          </Link>
-          <button
-            onClick={() => setIsAboutModalOpen(true)}
-            className="flex items-center space-x-3 text-white hover:bg-gray-700 hover:text-blue-400 rounded-lg p-3 transition-all duration-200 group text-left"
-          >
-            <FontAwesomeIcon icon={faInfoCircle} className="text-xl group-hover:scale-110 transition-transform duration-200" />
-            <span className="text-base">About</span>
-          </button>
-          <button
-            onClick={handleLogout}
-            className="flex items-center space-x-3 text-white hover:bg-gray-700 hover:text-red-400 rounded-lg p-3 transition-all duration-200 group"
-          >
-            <FontAwesomeIcon icon={faSignOutAlt} className="text-xl group-hover:scale-110 transition-transform duration-200" />
-            <span className="text-base">Logout</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Dashboard */}
+      <Sidebar
+        setIsAboutModalOpen={setIsAboutModalOpen}
+        setIsSettingModalOpen={setIsSettingModalOpen}
+        language={language}
+        setLanguage={setLanguage}
+      />
       <div className="dashboard flex-grow p-4 sm:p-6 lg:p-8 lg:w-[calc(100%-16rem)] overflow-auto bg-gray-50 dark:bg-gray-900">
         {error && (
           <div className="text-red-600 dark:text-red-400 p-4 bg-red-100 dark:bg-red-800/30 rounded-lg mb-6 animate-fade-in">
             {error}
           </div>
         )}
-        <header className="flex flex-col lg:flex-row justify-between items-center mb-8 px-4 sm:px-6 lg:px-0 space-y-6 lg:space-y-0">
-          <div className="flex flex-col items-center lg:items-start space-y-4">
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-teal-500 via-blue-500 to-green-500 animate-gradient-x flex items-center space-x-3">
-              <Image
-                src="/images/fresh-air.png"
-                width={40}
-                height={40}
-                alt="Fresh Air Icon"
-                className="animate-pulse"
-              />
-              <span>Healthy Air for All</span>
-            </h1>
-          </div>
-          <div className="flex flex-col sm:flex-row items-center sm:space-x-4 space-y-4 sm:space-y-0">
-            <p
-              id="datetime"
-              className="text-sm sm:text-base font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 py-2 px-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700"
-            >
-              วันที่: Loading...
-            </p>
-            <div className="relative flex items-center w-full sm:w-auto">
-              <input
-                type="text"
-                id="search"
-                className="p-3 pl-10 pr-4 w-full sm:w-64 lg:w-80 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full shadow-sm focus:ring-2 focus:ring-teal-400 focus:border-teal-400 dark:focus:ring-teal-500 dark:focus:border-teal-500 transition-all duration-300 text-gray-700 dark:text-gray-300 placeholder-gray-400 dark:placeholder-gray-500"
-                placeholder="ค้นหา..."
-              />
-              <FontAwesomeIcon
-                icon={faSearch}
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 text-lg"
-              />
-            </div>
-          </div>
-        </header>
-
+        <Header language={language} setLanguage={setLanguage} />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6">
           <div className="metric-card bg-gradient-to-br from-orange-400 to-red-500 dark:from-orange-500 dark:to-red-600 shadow-lg rounded-2xl flex items-center hover:scale-[1.02] transition-transform duration-300 animate-fade-in backdrop-blur-sm bg-opacity-90">
             <div className="w-2 h-full bg-orange-600 dark:bg-orange-700 rounded-l-2xl"></div>
             <div className="p-5 text-white flex flex-col w-full">
               <div className="flex justify-between items-center">
                 <p className="text-xs font-semibold tracking-wider uppercase">
-                  อุณหภูมิ
+                  {translations[language].temperature}
                 </p>
                 <FontAwesomeIcon
                   icon={faThermometerHalf}
@@ -730,16 +657,14 @@ export default function Dashboard() {
             <div className="p-5 text-white flex flex-col w-full">
               <div className="flex justify-between items-center">
                 <p className="text-xs font-semibold tracking-wider uppercase">
-                  ความหนาแน่นฝุ่น
+                  {translations[language].dust}
                 </p>
                 <FontAwesomeIcon icon={faSmog} className="text-2xl" />
               </div>
               <h2 id="dust" className="text-3xl font-bold mt-2">
                 {dust} µg/m³
               </h2>
-              <p className="text-xs mt-1 opacity-90">
-                ความเข้มข้นของฝุ่นละออง
-              </p>
+              <p className="text-xs mt-1 opacity-90">ความเข้มข้นของฝุ่นละออง</p>
               <div className="w-full mt-3 bg-white/30 h-1 rounded-full">
                 <div
                   className="bg-purple-300 h-full rounded-full"
@@ -753,16 +678,14 @@ export default function Dashboard() {
             <div className="p-5 text-white flex flex-col w-full">
               <div className="flex justify-between items-center">
                 <p className="text-xs font-semibold tracking-wider uppercase">
-                  ความชื้น
+                  {translations[language].humidity}
                 </p>
                 <FontAwesomeIcon icon={faTint} className="text-2xl" />
               </div>
               <h2 id="humid" className="text-3xl font-bold mt-2">
                 {humidity} RH
               </h2>
-              <p className="text-xs mt-1 opacity-90">
-                ความชื้นสัมพัทธ์ในอากาศ
-              </p>
+              <p className="text-xs mt-1 opacity-90">ความชื้นสัมพัทธ์ในอากาศ</p>
               <div className="w-full mt-3 bg-white/30 h-1 rounded-full">
                 <div
                   className="bg-teal-300 h-full rounded-full"
@@ -779,132 +702,24 @@ export default function Dashboard() {
 
         <section>
           <h3 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-200">
-            ประวัติ
+            {translations[language].history}
           </h3>
-          <input
-            type="date"
-            id="datePicker"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            className="p-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm focus:ring-2 focus:ring-teal-400 dark:focus:ring-teal-500 text-gray-700 dark:text-gray-300"
-          />
           <div className="chart-container mt-4 mb-2 bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 sm:p-6 animate-fade-in">
             <canvas id="barChart" className="w-full h-[300px]"></canvas>
           </div>
         </section>
       </div>
 
-      <div
-        className={`${
-          isAboutModalOpen ? "flex" : "hidden"
-        } fixed inset-0 bg-gray-900 bg-opacity-60 flex justify-center items-center z-50 backdrop-blur-sm`}
-      >
-        <div className="bg-white dark:bg-gray-800 p-6 sm:p-8 rounded-2xl shadow-2xl max-w-lg w-full transform transition-all duration-300 scale-100 animate-slide-in">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">
-            เกี่ยวกับเรา
-          </h2>
-          <p className="text-gray-600 dark:text-gray-300 mb-4">
-            ยินดีต้อนรับสู่ <strong>Healthy Air for All</strong> โซลูชันครบวงจรสำหรับการตรวจสอบคุณภาพอากาศแบบเรียลไทม์
-          </p>
-          <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mt-4">
-            ภารกิจของเรา
-          </h3>
-          <p className="text-gray-600 dark:text-gray-300">
-            ที่ Healthy Air for All เรามุ่งมั่นที่จะเสริมพลังให้ชุมชนด้วยเครื่องมือที่เชื่อถือได้เพื่อตรวจสอบและปรับปรุงคุณภาพอากาศ
-          </p>
-          <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mt-4">
-            คุณสมบัติหลัก
-          </h3>
-          <ul className="list-disc list-inside text-gray-600 dark:text-gray-300">
-            <li>การตรวจสอบแบบเรียลไทม์</li>
-            <li>แดชบอร์ดแบบโต้ตอบ</li>
-            <li>ประสบการณ์ที่ปรับแต่งได้</li>
-            <li>ข้อมูลย้อนหลัง</li>
-          </ul>
-          <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mt-4">
-            ทำไมต้องเลือกเรา?
-          </h3>
-          <p className="text-gray-600 dark:text-gray-300">
-            Healthy Air for All โดดเด่นด้วยการออกแบบที่ใช้งานง่าย ข้อมูลที่เชื่อถือได้ และความมุ่งมั่นในการสร้างสภาพแวดล้อมที่สุขภาพดี
-          </p>
-          <div className="mt-6 flex justify-end">
-            <button
-              onClick={() => setIsAboutModalOpen(false)}
-              className="bg-teal-500 text-white px-5 py-2 rounded-lg hover:bg-teal-600 transition-colors duration-200 shadow-sm"
-            >
-              ปิด
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div
-        className={`${
-          isSettingModalOpen ? "flex" : "hidden"
-        } fixed inset-0 bg-gray-900 bg-opacity-60 flex justify-center items-center z-50 backdrop-blur-sm`}
-      >
-        <div className="bg-white dark:bg-gray-800 p-6 sm:p-8 rounded-2xl shadow-2xl max-w-md w-full transform transition-all duration-300 scale-100 animate-slide-in">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-            การตั้งค่า
-          </h2>
-          <p className="mt-3 text-gray-600 dark:text-gray-300">
-            ปรับแต่งการตั้งค่าของคุณที่นี่
-          </p>
-          <div className="mt-4 space-y-6">
-            <div>
-              <label
-                htmlFor="themeSelect"
-                className="block text-gray-700 dark:text-gray-300 font-medium"
-              >
-                ธีม:
-              </label>
-              <select
-                id="themeSelect"
-                value={theme}
-                onChange={(e) => setTheme(e.target.value)}
-                className="mt-1 w-full bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-sm focus:ring-2 focus:ring-teal-400 dark:focus:ring-teal-500 text-gray-700 dark:text-gray-300"
-              >
-                <option value="light">สว่าง</option>
-                <option value="dark">มืด</option>
-                <option value="system">ตามระบบ</option>
-              </select>
-            </div>
-            <div>
-              <label
-                htmlFor="languageSelect"
-                className="block text-gray-700 dark:text-gray-300 font-medium"
-              >
-                ภาษา:
-              </label>
-              <select
-                id="languageSelect"
-                value={language}
-                onChange={(e) => setLanguage(e.target.value)}
-                className="mt-1 w-full bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-sm focus:ring-2 focus:ring-teal-400 dark:focus:ring-teal-500 text-gray-700 dark:text-gray-300"
-              >
-                <option value="en">English</option>
-                <option value="th">ภาษาไทย</option>
-                <option value="es">Español</option>
-              </select>
-            </div>
-          </div>
-          <div className="mt-6 flex justify-end gap-4">
-            <button
-              onClick={saveSettings}
-              className="bg-green-500 text-white px-5 py-2 rounded-lg hover:bg-green-600 transition-colors duration-200 shadow-sm"
-            >
-              บันทึก
-            </button>
-            <button
-              onClick={() => setIsSettingModalOpen(false)}
-              className="bg-red-500 text-white px-5 py-2 rounded-lg hover:bg-red-600 transition-colors duration-200 shadow-sm"
-            >
-              ปิด
-            </button>
-          </div>
-        </div>
-      </div>
-
+      <Model
+        isAboutModalOpen={isAboutModalOpen}
+        setIsAboutModalOpen={setIsAboutModalOpen}
+        isSettingModalOpen={isSettingModalOpen}
+        setIsSettingModalOpen={setIsSettingModalOpen}
+        theme={theme}
+        setTheme={setTheme}
+        language={language}
+        setLanguage={setLanguage}
+      />
       <Script
         src="https://cdn.jsdelivr.net/npm/chart.js"
         strategy="afterInteractive"
