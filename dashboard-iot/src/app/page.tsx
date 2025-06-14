@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import Contact from "./components/Contact";
 import AOS from "aos";
 import "aos/dist/aos.css";
 
@@ -308,43 +309,7 @@ export default function Home() {
             data-aos="fade-up"
             data-aos-delay="100"
           >
-            <form className="space-y-6">
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Name-Surname
-                </label>
-                <input
-                  type="text"
-                  placeholder="Please enter your name and surname"
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors shadow-sm"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  E-mail
-                </label>
-                <input
-                  type="email"
-                  placeholder="example@email.com"
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors shadow-sm"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Message
-                </label>
-                <textarea
-                  placeholder="Please enter your message"
-                  className="w-full h-32 md:h-40 px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors shadow-sm resize-none"
-                ></textarea>
-              </div>
-              <button
-                type="submit"
-                className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition font-medium shadow-md hover:shadow-lg"
-              >
-                Send Message
-              </button>
-            </form>
+            <Contact />
           </div>
         </div>
       </div>
